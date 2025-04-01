@@ -422,8 +422,11 @@
     }
 
     // 允許在卡片內部滾動而不觸發卡片關閉
+    // document.querySelector('.fortune-back').addEventListener('click', function(e) {
+    //   e.stopPropagation();
+    // });
     document.querySelector('.fortune-back').addEventListener('click', function(e) {
-      e.stopPropagation();
+  toggleTicket(e);
     });
 
     // 檢測滾動位置，顯示/隱藏滾動提示
