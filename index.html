@@ -396,15 +396,17 @@
     // Toggle ticket
     function toggleTicket(event) {
       const ticket = document.querySelector('.fortune-container');
-      
+
+      ticket.classList.add('shake');
+      createStarBurst(event.clientX, event.clientY);
       // 如果已經展開，點擊時不要再觸發星星效果
-      if (!ticket.classList.contains('unfolded')) {
-        // Create star burst at click position
-        createStarBurst(event.clientX, event.clientY);
+      // if (!ticket.classList.contains('unfolded')) {
+      //   // Create star burst at click position
+      //   createStarBurst(event.clientX, event.clientY);
         
-        // Add shake effect
-        ticket.classList.add('shake');
-      }
+      //   // Add shake effect
+      //   ticket.classList.add('shake');
+      // }
       
       // Delayed ticket opening
       setTimeout(() => {
