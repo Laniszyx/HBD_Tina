@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生日快樂!來自好友的祝福~</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(135deg, #E0F7FA, #B3E5FC);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      perspective: 1000px;
+      padding: 20px 0;
+    }
+    .fortune-container {
+      width: 300px;
+      height: 150px;
+      background: #E3F2FD;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.6s ease;
+      transform-style: preserve-3d;
+      position: relative;
+      overflow: hidden;
+      z-index: 10;
+    }
+    .fortune-container.shake {
+      animation: shake 0.5s;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    /* 展開後卡片尺寸（桌機版） */
+    .fortune-container.unfolded {
+      width: 90%;
+      max-width: 420px;
+      height: auto;
+      min-height: 600px;
+    }
+    /* 響應式調整：手機裝置 */
+    @media (max-width: 480px) {
+      .fortune-container {
+        width: 95%;
+        max-width: 340px;
+      }
+      .fortune-container.unfolded {
+        width: 95%;
+        max-width: 340px;
+      }
+    }
+    .fortune-front, .fortune-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.6s ease;
+    }
+    .fortune-front {
+      background: linear-gradient(135deg, #B3E5FC, #E1F5FE);
+      flex-direction: column;
+      z-index: 2;
+      padding: 20px;
+      text-align: center;
+    }
+    .fortune-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .fortune-header h1 {
+      color: #FF4500;
+      font-size: 24px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    .fortune-body {
+      padding-top: 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .divider {
+      width: 80%;
+      height: 1px;
+      background-color: #ADD8E6; /* 淡藍色 */
+      margin: 15px 0;
+    }
+    .big-fortune {
+      font-size: 36px;
+      color: #ff1493; /* 更改為與願望求財相同的淡粉紅色 */
+      font-weight: bold;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      border: 2px solid #ff1493;
+      padding: 10px 20px;
+      border-radius: 10px;
+      background-color: rgba(255,255,255,0.5);
+    }
+    .fortune-item {
+      margin-bottom: 12px;
+      font-size: 16px;
+      color: #555;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      border-bottom: 1px dotted #ccc;
+      padding-bottom: 5px;
+    }
+    .fortune-item strong {
+      color: #ff1493; /* 淡粉紅 */
+      min-width: 80px;
+      display: inline-block;
+    }
+    .fortune-item span {
+      color: #FFB6C1; /* 更淡的粉紅 */
+      font-weight: bold;
+    }
+    .greeting {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #ff1493;
+      text-align: center;
+      line-height: 1.6;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .greeting p {
+      margin-bottom: 10px;
+    }
+    .fortune-back {
+      background: url('https://api.placeholder.com/400/320') center/cover no-repeat;
+      background-color: #E3F2FD;
+      z-index: 1;
+      padding: 25px;
+      overflow-y: auto;
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+    }
+    .fortune-container.unfolded .fortune-front {
+      transform: rotateY(180deg);
+    }
+    .fortune-container.unfolded .fortune-back {
+      transform: rotateY(0);
+    }
+    /* Floating elements */
+    .floating-element {
+      position: fixed;
+      pointer-events: none;
+      opacity: 0.6;
+      top: -50px;
+      animation: float-down linear infinite;
+    }
+    .flower {
+      font-size: 30px;
+    }
+    .snowflake {
+      font-size: 20px;
+      color: rgba(255,255,255,0.7);
+    }
+    @keyframes float-down {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+    /* Star Burst Effect */
+    .star-burst {
+      position: fixed;
+      pointer-events: none;
+      font-size: 20px;
+      opacity: 1;
+      z-index: 100;
+      transition: all 0.8s ease-out;
+    }
+    /* 新增日本風格元素 */
+    .japanese-pattern {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M0 20c5.5 0 10-4.5 10-10S5.5 0 0 0v20zm20 0c-5.5 0-10 4.5-10 10s4.5 10 10 10V20zm0-20c5.5 0 10 4.5 10 10s-4.5 10-10 10V0zM40 20c-5.5 0-10 4.5-10 10s4.5 10 10 10V20zm0-20c-5.5 0-10 4.5-10 10s4.5 10 10 10V0z" fill="rgba(255,69,0,0.1)"/></svg>');
+      opacity: 0.2;
+      z-index: -1;
+    }
+    .stamp {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      color: #FF0000;
+      font-size: 24px;
+      border: 2px solid #FF0000;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform: rotate(15deg);
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="fortune-container" onclick="toggleTicket(event)">
+    <div class="fortune-front">
+      <h2>查看生日祝福卡</h2>
+    </div>
+    <div class="fortune-back">
+      <div class="japanese-pattern"></div>
+      <div class="fortune-header">
+        <h1>心願成真祈福卡</h1>
+      </div>
+      <div class="fortune-body">
+         <div class="big-fortune">大大吉</div>
+         
+         <div class="divider"></div>
+         
+         <div class="fortune-item">
+           <strong>願望:</strong> <span>會實現</span>
+         </div>
+         <div class="fortune-item">
+           <strong>求財:</strong> <span>會爆富</span>
+         </div>
+         <div class="fortune-item">
+           <strong>健康:</strong> <span>青春無敵</span>
+         </div>
+         <div class="fortune-item">
+           <strong>旅行:</strong> <span>升等頭等艙</span>
+         </div>
+         <div class="fortune-item">
+           <strong>家人:</strong> <span>健康快樂幸福</span>
+         </div>
+         <div class="fortune-item">
+           <strong>工作:</strong> <span>易如反掌</span>
+         </div>
+         <div class="fortune-item">
+           <strong>美食:</strong> <span>好口福</span>
+         </div>
+        <div class="fortune-item">
+           <strong>心靈:</strong> <span>富足自在</span>
+         </div>
+         
+         <div class="greeting" id="greeting"></div>
+      </div>
+      <div class="stamp">吉</div>
+    </div>
+  </div>
+
+  <script>
+    // Floating elements
+    function createFloatingElements() {
+      const flowers = ['🌸', '🌷', '🌹','💐','🩷','🍀','🏮'];
+      const snowflakes = ['❄️', '✿', '❁','🤍','🩵','🎐','✨','🧧'];
+      
+      function createFloatingElement(elements, className) {
+        const element = document.createElement('div');
+        element.textContent = elements[Math.floor(Math.random() * elements.length)];
+        element.classList.add('floating-element', className);
+        
+        element.style.left = `${Math.random() * 100}%`;
+        element.style.animationDuration = `${Math.random() * 10 + 5}s`;
+        
+        document.body.appendChild(element);
+      }
+
+      for (let i = 0; i < 6; i++) {
+        createFloatingElement(flowers, 'flower');
+        createFloatingElement(snowflakes, 'snowflake');
+      }
+    }
+
+    // Star Burst Effect
+    function createStarBurst(x, y) {
+      const stars = ['✨', '🌟', '⭐'];
+      const starCount = 20;
+      const gravity = 0.2;
+
+      for (let i = 0; i < starCount; i++) {
+        const starBurst = document.createElement('div');
+        starBurst.classList.add('star-burst');
+        
+        starBurst.textContent = stars[Math.floor(Math.random() * stars.length)];
+        
+        const angle = Math.random() * Math.PI * 2;
+        const initialVelocity = Math.random() * 200 + 100;
+        
+        starBurst.style.left = `${x}px`;
+        starBurst.style.top = `${y}px`;
+        
+        starBurst.style.transform = 'scale(1)';
+        starBurst.style.opacity = '1';
+        
+        document.body.appendChild(starBurst);
+        
+        let time = 0;
+        const animate = () => {
+          time += 0.05;
+          
+          const newX = x + Math.cos(angle) * initialVelocity * time;
+          const newY = y + Math.sin(angle) * initialVelocity * time + 0.5 * gravity * time * time;
+          
+          starBurst.style.left = `${newX}px`;
+          starBurst.style.top = `${newY}px`;
+          
+          starBurst.style.opacity = Math.max(0, 1 - time * 0.5);
+          starBurst.style.transform = `scale(${Math.max(0, 1 - time * 0.5)})`;
+          
+          if (newY > window.innerHeight || newX < 0 || newX > window.innerWidth || parseFloat(starBurst.style.opacity) <= 0) {
+            document.body.removeChild(starBurst);
+            return;
+          }
+          
+          requestAnimationFrame(animate);
+        };
+        
+        animate();
+      }
+    }
+
+    // Greeting logic：一次性顯示全部祝福語
+    const greetings = [
+      "親愛的 Tina Huang：",
+      "願妳的每一天都充滿陽光和微笑",
+      "非常謝謝這世界讓我遇見認識妳",
+      "祝妳 生日快樂!",
+      "事業順利，生活甜蜜~",
+      "身體健康，幸福美滿~",
+      "心想事成~",
+      "Sincerely",
+      "Nelson Zheng",
+      "20250402"
+    ];
+
+    function showGreeting() {
+      const greetingEl = document.getElementById('greeting');
+      // 使用 <p> 標籤換行顯示全部祝福語
+      greetingEl.innerHTML = greetings.map(greeting => `<p>${greeting}</p>`).join('');
+    }
+
+    // Toggle ticket
+    function toggleTicket(event) {
+      const ticket = document.querySelector('.fortune-container');
+      
+      // Create star burst at click position
+      createStarBurst(event.clientX, event.clientY);
+      
+      // Add shake effect
+      ticket.classList.add('shake');
+      
+      // Delayed ticket opening
+      setTimeout(() => {
+        ticket.classList.remove('shake');
+        ticket.classList.toggle('unfolded');
+        
+        // 當卡片展開時，直接顯示所有祝福語
+        if (ticket.classList.contains('unfolded')) {
+          showGreeting();
+        }
+      }, 500);
+    }
+
+    // Initialize floating elements
+    createFloatingElements();
+
+    // Continuously replenish floating elements
+    setInterval(createFloatingElements, 10000);
+  </script>
+</body>
+</html>
