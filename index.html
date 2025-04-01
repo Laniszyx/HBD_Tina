@@ -47,17 +47,25 @@
       width: 90%;
       max-width: 420px;
       height: auto;
-      min-height: 700px;
+      min-height: 80vh; /* 改為視窗高度的80% */
+      max-height: 80vh; /* 限制最大高度 */
+      overflow-y: auto; /* 允許內容滾動 */
     }
     /* 響應式調整：手機裝置 */
     @media (max-width: 480px) {
       .fortune-container {
-        width: 95%;
+        width: 90%;
         max-width: 340px;
       }
       .fortune-container.unfolded {
         width: 95%;
         max-width: 340px;
+        min-height: 80vh; /* 手機版高度調整 */
+        max-height: 85vh; /* 手機版最大高度限制 */
+        padding-bottom: 30px; /* 增加底部內邊距 */
+      }
+      .fortune-body {
+        padding-bottom: 20px; /* 確保內容不會太貼近底部 */
       }
     }
     .fortune-front, .fortune-back {
@@ -95,6 +103,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: 100%;
+      overflow-y: auto; /* 允許內容獨立滾動 */
     }
     .divider {
       width: 80%;
@@ -143,6 +153,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      padding-bottom: 40px; /* 確保祝福語底部有足夠空間 */
     }
     .greeting p {
       margin-bottom: 10px;
@@ -152,7 +163,7 @@
       background-color: #E3F2FD;
       z-index: 1;
       padding: 25px;
-      overflow-y: auto;
+      overflow-y: auto; /* 改為可滾動 */
       transform: rotateY(180deg);
       display: flex;
       flex-direction: column;
@@ -162,6 +173,9 @@
     }
     .fortune-container.unfolded .fortune-back {
       transform: rotateY(0);
+      position: relative; /* 改為相對定位 */
+      overflow-y: auto; /* 確保內容可滾動 */
+      -webkit-overflow-scrolling: touch; /* 提高iOS滾動體驗 */
     }
     /* Floating elements */
     .floating-element {
@@ -170,6 +184,7 @@
       opacity: 0.6;
       top: -50px;
       animation: float-down linear infinite;
+      z-index: 5; /* 降低浮動元素層級 */
     }
     .flower {
       font-size: 30px;
@@ -216,6 +231,27 @@
       transform: rotate(15deg);
       opacity: 0.7;
     }
+
+    /* 新增可捲動提示 */
+    .scroll-hint {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #ff1493;
+      font-size: 12px;
+      opacity: 0.8;
+      animation: pulse 1.5s infinite;
+      display: none;
+    }
+    .fortune-container.unfolded .scroll-hint {
+      display: block;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 0.9; }
+      100% { opacity: 0.4; }
+    }
   </style>
 </head>
 <body>
@@ -261,6 +297,7 @@
          <div class="greeting" id="greeting"></div>
       </div>
       <div class="stamp">吉</div>
+      <div class="scroll-hint">↑ 向上滑動查看更多 ↑</div>
     </div>
   </div>
 
@@ -359,11 +396,14 @@
     function toggleTicket(event) {
       const ticket = document.querySelector('.fortune-container');
       
-      // Create star burst at click position
-      createStarBurst(event.clientX, event.clientY);
-      
-      // Add shake effect
-      ticket.classList.add('shake');
+      // 如果已經展開，點擊時不要再觸發星星效果
+      if (!ticket.classList.contains('unfolded')) {
+        // Create star burst at click position
+        createStarBurst(event.clientX, event.clientY);
+        
+        // Add shake effect
+        ticket.classList.add('shake');
+      }
       
       // Delayed ticket opening
       setTimeout(() => {
@@ -373,9 +413,31 @@
         // 當卡片展開時，直接顯示所有祝福語
         if (ticket.classList.contains('unfolded')) {
           showGreeting();
+          // 修復可能的滾動問題
+          setTimeout(() => {
+            document.querySelector('.fortune-back').scrollTop = 0;
+          }, 100);
         }
       }, 500);
+
+      // 阻止事件冒泡，使卡片展開後點擊內容不會觸發收起
+      event.stopPropagation();
     }
+
+    // 允許在卡片內部滾動而不觸發卡片關閉
+    document.querySelector('.fortune-back').addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+
+    // 檢測滾動位置，顯示/隱藏滾動提示
+    document.querySelector('.fortune-back').addEventListener('scroll', function() {
+      const scrollHint = document.querySelector('.scroll-hint');
+      if (this.scrollTop > 50) {
+        scrollHint.style.display = 'none';
+      } else {
+        scrollHint.style.display = 'block';
+      }
+    });
 
     // Initialize floating elements
     createFloatingElements();
